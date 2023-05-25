@@ -1,0 +1,153 @@
+---
+title: "Module 4 - Tidying Data with Tidyverse"
+author: "Lansing Perng"
+date: "Fall 2023"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+Tidyverse is a collection of R packages that are designed to work together seamlessly to make data manipulation, visualization, and analysis easier and more intuitive. In tidy data, each variable is a column and each observation is a row. This makes it easy to use functions like dplyr and ggplot2 to manipulate and visualize data.
+
+Some of the most popular packages in Tidyverse include:
+
+- `readr`: for reading in and parsing various file types.
+- `dplyr`: for data manipulation tasks such as filtering, selecting, and summarizing data.
+- `tidyr`: for reshaping and tidying data.
+- `stringr`: for string manipulation tasks.
+- `lubridate`: for working with dates and times.
+- `ggplot2`: for creating high-quality, customizable visualizations.
+- `purrr`: for functional programming tasks such as mapping and reducing.
+
+One of the main advantages of Tidyverse is that it provides a consistent and intuitive syntax across packages, making it easier to learn and use. It also emphasizes the use of piping (%>%) to chain functions together, which can make code more readable and efficient.
+
+Overall, Tidyverse has become a popular choice for data scientists and analysts due to its powerful and user-friendly tools for data manipulation and visualization. You can use tidyverse outputs with packages outside of the tidyverse, but sometimes this may require minor manipulation or conversion. Basically, tidyverse is the Apple of the R world.
+
+```{r}
+######## tidyr & stringr
+
+## recoding data (replacing character names in one column with a code)
+# Example data
+data <- data.frame(sex = c("M", "F", "M", "F", "M"))
+
+# Recode the sex column using tidyverse
+data$scode <- recode(data$sex, "M" = "1", "F" = "2")
+
+# View the updated data
+data
+
+## some less common but useful functions
+library(tidyr)
+
+# create sample data frame
+df <- data.frame(
+  name = c("Alice", "Bob", "Charlie"),
+  age = c(30, NA, 25),
+  city = c("New York, Los Angeles", "Chicago", "Seattle")
+)
+print(df)
+
+# drop rows with missing values
+df_drop <- drop_na(df)
+print(df_drop)
+
+# replace missing values with another specified value
+df_replace <- replace_na(df, list(age = 0))
+print(df_replace)
+
+
+##### stringr
+
+library(stringr)
+
+# Create a string
+my_string <- "The quick brown fox jumps over the lazy dog"
+
+# Get the length of the string
+str_length(my_string)
+
+# Extract a substring
+str_sub(my_string, start = 5, end = 9)
+
+# Replace a substring
+str_replace(my_string, "brown", "red")
+
+# Check if a pattern is present
+str_detect(my_string, "fox")
+
+# Extract a pattern
+str_extract(my_string, "brown|red") #brown OR red
+
+# Split a string
+vec<- unlist(str_split(my_string, " ")) #function creates list, which cannot be easily manipulated
+#unlisting turns it into a workable vector
+df1<- data.frame(vec)
+
+#demo separate()
+# create example data frame
+df <- data.frame(
+  cities1 = c("New York, NY", "Los Angeles, CA", "Chicago, IL", "Miami, FL")
+)
+# separate columns at comma
+df_sep <- separate(df, cities1, into = c("city1", "state1"), sep = ",\\s*")
+
+
+```
+
+
+
+```{r}
+# Load lubridate library
+library(lubridate)
+
+# Create a date object
+date1 <- ymd("20220331")
+date2 <- mdy("03/31/2022")
+
+# Print the dates
+print(date1)
+print(date2)
+
+# Create a time object
+time1 <- hm("13:45")
+time2 <- hms("13:45:15")
+
+# Print the times
+print(time1)
+print(time2)
+
+# Combine the date and time objects
+datetime1 <- ymd_hm("2022-03-31 13:45")
+datetime2 <- mdy_hms("03/31/2022 01:45:15 PM")
+
+# Print the datetimes
+print(datetime1)
+print(datetime2)
+
+# Extract the components of a datetime object
+year(datetime1)
+month(datetime1)
+day(datetime1)
+hour(datetime1)
+minute(datetime1)
+second(datetime1)
+
+# Calculate the difference between two datetime objects
+time_diff <- difftime(datetime2, datetime1)
+print(time_diff)
+
+```
+
+## 
+
+
+
+
+##### Additional Resources
+[Data Wrangling Cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)

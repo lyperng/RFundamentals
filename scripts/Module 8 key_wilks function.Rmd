@@ -1,0 +1,73 @@
+---
+title: "Wilks Function"
+author: "Lansing Perng"
+date: "2023-04-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Creating a custom function for calculating Wilk's scores
+
+```{r}
+wilks_score <- function(bodyweight, lifted_weight, gender,is_metric) {
+  if (gender %in% c("M", "Male")) {
+    a <- -216.0475144
+    b <- 16.2606339
+    c <- -0.002388645
+    d <- -0.00113732
+    e <- 7.01863E-06
+    f <- -1.291E-08
+  } else {
+    a <- 594.31747775582
+    b <- -27.23842536447
+    c <- 0.82112226871
+    d <- -0.00930733913
+    e <- 4.731582E-05
+    f <- -9.054E-08
+  }
+  
+  if (is_metric) {
+    weight_kg <-bodyweight
+    x <- lifted_weight
+  } else {
+    weight_kg <- bodyweight / 2.20462
+    x <- lifted_weight/2.20462
+  }
+
+  coefficient <- 500 / (a + b * weight_kg + c * weight_kg^2 + d * weight_kg^3 + e * weight_kg^4 + f * weight_kg^5)
+  
+  wilks_score <- x * coefficient
+  return(wilks_score)
+}
+
+```
+
+## Test it!
+
+For a female weighting 130 lbs and lifting 150 lbs:
+
+```{r}
+wilks_score(130,150,'female', 'F')
+```
+
+We added extra accessibility to the function by accepting either kg or lbs!
+
+```{r}
+bodyweight<-rnorm(20,145,30)
+lifted<-rnorm(20,200,40)
+df<-data.frame(bodyweight,lifted)
+
+wilkscol<-purrr::pmap(df, wilks_score, gender = 'M', is_metric = F)
+
+# add wilkscol as third column
+df$Wilks<-unlist(wilkscol)
+
+
+#export to outputs folder
+write.csv(df, here('outputs','Wilks.csv'), row.names=F)
+
+```
+

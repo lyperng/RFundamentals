@@ -1,0 +1,72 @@
+---
+title: "Module 3 - Intro to Data Wrangling with Base R and dplyr"
+author: "Lansing Perng"
+date: "Fall 2023"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+In our intro to data wrangling module, we will cover the following topics:
+- Importing data into R
+- Data exploration (str(), unique(), which(), hist(), boxplot())
+- Data transformations
+- Subsetting data and operators in R (arithmetic, logical)
+- Editing entries in a dataframe (df$col[row],df[row,col])
+- Dealing with imperfect data (NAs, outliers)
+
+## Importing data
+```{r}
+write.csv(iris,here('data','iris.csv'), row.names = F) # we will go over writing files at the end
+
+iris<-read.csv(here('data','iris.csv')) # import data directly from your data folder
+
+```
+
+
+## Data exploration
+
+The first thing you should do when you're starting to work with a dataset is data exploration. We want to see what the data look like and explore the spread/distribution.
+```{r}
+plot(iris$Petal.Length,iris$Sepal.Length) # simple plot to visualize the data
+
+# frequency plot using hist()
+hist(iris$Sepal.Length, breaks = 10,  # breaks determines how you want counts to be grouped
+        main = "Counts of Sepal Length")
+
+
+# shows spread of data in summary terms using boxplot
+boxplot(iris$Sepal.Length,     
+        main = "Distribution of Sepal Length") 
+```
+
+
+## Data transformation
+
+## Indexing and subsetting data structures
+
+### R Operators
+
+You can manipulate data in R using various operators, including arithmetic operators for performing calculations, and logical operators for subsetting data. A brief summary is here: <https://www.statmethods.net/management/operators.html>
+
+## Random sampling and data generation
+
+```{r}
+set.seed(99) #will need to run a set.seet() before each randomizing line of code
+x <- rnorm(50, mean = 100, sd = 25)  # create example vector
+
+x_rsample <- sample(x, size = 30)  # randomly sample 30 points from vector
+x_randomized <- sample(x)  # randomize the order of the elements in the vector
+```
+
+
+##### Additional Resources
+
+
+

@@ -1,0 +1,75 @@
+---
+title: "Module 10 - Advanced ggplot2"
+author: "Lansing Perng"
+date: "Fall 2023"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+## Get your plots publication ready
+
+You may want to reorder the levels of one of your categorical variables. The default order is alphabetical, but something else might be more meaningful for your research.
+
+```{r}
+
+```
+
+
+It may also be cleaner for your plot to only color the vital elements. A transparent background can come in handy for making present
+```{r}
+g7 <- g6 +
+  theme(  panel.grid.major = element_blank(), #delete major grid lines
+          panel.grid.minor = element_blank(), #delete minor grid lines
+          panel.background = element_rect(fill = "transparent",color = 'black', size = 1), 
+          # transparent plot area, black axis lines of thickness 1
+          
+          plot.background = element_rect(fill = "transparent",color = NA), # transparent page background
+          plot.margin = unit(c(0.3,2,0.3,0.3), "cm")) # specify plot margins in cm
+```
+
+
+
+## ggplot legends
+
+```{r}
+      theme(  panel.grid.major = element_blank(), #delete major grid lines
+              panel.grid.minor = element_blank(), #delete minor grid lines
+              panel.background = element_rect(fill = "transparent",colour = 'black', size = 1),
+              plot.background = element_rect(fill = "transparent",colour = NA),
+
+              legend.position = 'right', # c(0.37,0.57),
+              legend.background = element_rect(fill="transparent", color = 'black'),
+              legend.key = element_rect(fill = "transparent", colour = NA),
+              legend.key.size = unit(1, 'cm'),
+              legend.spacing.y = unit(0.2, 'cm'),
+              legend.text=element_text(size=17),
+              legend.title=element_blank(),
+              legend.margin = margin(2,12,8,10)) +
+        guides(fill=guide_legend(byrow = T)) +
+
+```
+
+
+
+## Complex plot types
+NA handling?
+
+## Color palettes
+
+## Counts and stacked plots
+
+## Facets and layers
+
+## Module Assignment
+If you need help arranging the plots nicely on a page, see additional resources below.
+Edit their time series graph to show anomalies instead, compared to a historical value/mean
+
+#### Additional Resources
+[Arranging plots on a page](https://ggplot2-book.org/arranging-plots.html)

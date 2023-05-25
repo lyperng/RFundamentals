@@ -1,0 +1,115 @@
+---
+title: "Writing Functions in R"
+author: "Lansing Perng"
+date: "Fall 2023"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+In our function writing module, we will learn how to write custom functions for unique research purposes. Writing functions serves to optimize workflow, organize scripts, save time, and reduce errors!. When you need to apply the same function or set of functions repeatedly, instead of writing it over and over again, you can write it into a function for which you only need to fill in a few changing variables.
+
+For example, in our first module, I provided code for creating new folders in your working directory that included a function:
+
+```{r, eval=FALSE}
+folders<- c("scripts", "data", "outputs", "figures")
+
+create.folders <- function(folder) {
+  dir.create(file.path(dir,folder))
+}
+sapply(folders,create.folders)
+```
+
+Once I have the function I can create as many folders as I want and rename them by simply editing the 'folders' vector. Additionally, it is a best practice when coding in R to reduce interaction with your code as much as possible when rerunning. With the written function, the user only needs to edit the vector.
+
+Without the function, it would have looked like this:
+
+```{r, eval=FALSE}
+
+dir.create(file.path(dir,"scripts"))
+dir.create(file.path(dir,"data"))
+dir.create(file.path(dir,"outputs"))
+dir.create(file.path(dir,"figures"))
+```
+
+The user would need to edit each line if they want to name the folders something different, which can introduce errors. It may not seem much easier or quicker than copying and pasting the same code repeatedly, but what if you wanted to create 10 folders instead of 4? What if the function were more complicated than one line of 2 nested functions?
+
+## Creating custom functions
+
+Let's start with a simple function to calculate BMI
+
+
+```{r}
+calculate_bmi <- function(weight_kg, height_m, output=T) { #name function and specify arguments
+  bmi <- weight_kg / (height_m^2) 
+  if(output) return(bmi) # by default, the code is executed within the function, but does not produce output outside of the function unless you specifically tell it to
+}
+
+calculate_bmi(60, 1.5) # it works! but kind of annoying to have to convert to metric
+# is there a way to allow the function to accept either lbs & ft or kg an m?
+```
+
+This function takes 3 arguments: weight in kg, height in m, and an *optional* argument specifying whether you want the output returned when you run the function. You can specify an optional argument by filling in a default value. Here, we set the default as TRUE, so the function will return an output unless you set output=F. When you set have an argument that is a logical, you usually have to write a conditional to execute that part of the function: 'if the logical is T, execute code A, if F, execute code B.' In this case, if the logical is F, the code does nothing a.k.a. it will not execute the return() function.
+
+
+<span style="color: indianred">Now let's practice writing a simple one. How about a converter? Between kg and lb, mL and oz, F&deg; and C&deg;, USD to Euro, anything you can think of. Google the conversion and start coding!</span>
+
+
+## Best practices for writing functions in R
+
+1. Start with a clear purpose statement: Start with an introductory comment describing what the function does in clear and concise language.
+
+2. Use descriptive function and parameter names: Choose descriptive and meaningful names for your function and parameters (arguments). This makes it easier for others (and yourself) to understand what the function does and how to use it.
+
+3. Document your function: Use comments to describe what each part of the function is doing. Also include information about what inputs the function expects, what outputs it produces, and any other relevant details.
+
+4. Write modular and reusable code: Try to write functions that can be used in multiple contexts, and keep them as modular as possible so that they can be easily modified or extended.
+
+5. Handle errors gracefully: Your function should be able to handle unexpected inputs or errors gracefully, providing useful error messages to the user.
+
+6. Use vectorized operations: R is optimized for vectorized operations, so try to use them as much as possible to improve the efficiency of your code.
+
+7. Use unit testing: Test your function with a variety of inputs and expected outputs to ensure that it works as expected.
+
+8. Follow R conventions and style guide: Follow R conventions and style guide to ensure that your code is consistent and easy to read. Google's [style guide](https://web.stanford.edu/class/cs109l/unrestricted/resources/google-style.html) for reference, but the most important thing is that someone who is unfamiliar with your code can pick it up and read it.
+
+## Module Assignment
+
+Write an R Markdown document containing the following:
+
+1. <span style="color: cornflowerblue">(50 pts)</span> Write a function to **calculate Wilk's score** based on *body weight*, *lifted weight*, and *gender* that will accept both lbs or kg inputs. Make sure it is well commented and include function documentation similar to what you see in the R help tab when you run `?function`. Include a description, usage, and arguments section. <br>The final Wilk's score is lifted weight &times; Wilk's coefficient. Use the equation and coefficients table below for calculating the score within your function:
+
+ $$Wilk's\ coefficient = \frac{500}{a + b  x + c x^2 + d  x^3 + e  x^4 + f  x^5}$$
+```{r, echo=FALSE}
+# Create the coefficients table
+coefficients_table <- data.frame(
+  Gender = c("Male", "Female"),
+  a = c(-216.0475144, 594.31747775582),
+  b = c(16.2606339, -27.23842536447),
+  c = c(-0.002388645, 0.82112226871),
+  d = c(-0.00113732, -0.00930733913),
+  e = c(7.01863E-06, 4.731582E-05),
+  f = c(-1.291E-08, -9.054E-08)
+)
+knitr::kable(coefficients_table)
+```
+2. <span style="color: cornflowerblue">(30 pts)</span> Write code that **applies your function** to an input data frame with two columns (body weight and lifted weight) and an unspecified number of rows. Create this data frame in your script and use it to complete this problem. Make sure your df has relatively realistic weights and a good spread of data. You should be able to run the function on a data frame of any length. Note that this means there are now two moving parts for your function arguments and take that into account when you are choosing how to implement it efficiently. Once you have your outputs of Wilk's scores for each of the entries, add them as a third column to your data frame. Finally, the function should export the final df to your **'outputs'** folder using the `here` function. Note that if your output is in a data type that is unrecognized by the function you are using, you may run into errors when running your script. <br><span style="color: cornflowerblue">(20 pts)</span>In addition to whether your code accomplishes the task, you will also be graded on the simplicity of your script (the more concise your code, the better), computational efficiency, and reproducibility (whether someone else can take your code and run/understand it without trouble). 
+
+3. A reflection of the module including:
+    - difficulty 1-10 and why 
+    - was it a useful/informative?
+    - was it too long or too short? 
+    - what you liked, what you didn't
+    - suggestions for future improvement
+<br>
+
+#### Additional Resources
+
+[How to Write Functions in R - Dataquest](https://www.dataquest.io/blog/write-functions-in-r/)
+

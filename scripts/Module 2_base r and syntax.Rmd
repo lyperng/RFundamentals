@@ -1,0 +1,47 @@
+---
+title: "Module 2 - Base R Functions and Syntax"
+author: "Lansing Perng"
+date: "Fall 2023"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Overview
+
+
+- []
+- length()
+
+
+## Creating data structures
+
+R does not accept spaces in column names
+
+```{r}
+Year<-seq(1995,2020)
+Coral<-rnorm(length(Year), 10,4)
+Algae<-rnorm(length(Year), 20,7)
+
+df<-data.frame(Year,Coral,Algae)
+View(df)
+head(df)
+```
+Sometimes we may want to include information about our data in our body text. Inline code can be handy in case something about our data changes. If we refer to it using inline code, we will not have to separately update our text and it also reduces the chance of errors. Use inline code with r and add the code to evaluate within the ``backticks``.
+
+For example, the data frame we created above has `r nrow(df)` rows and `r ncol(df)` columns. This is written as:
+
+```{r, eval=F}
+the data frame we created above has `r nrow(df)` rows and `r ncol(df)` columns.
+```
+
+
+
+##### Additional Resources
+- [R syntax quirks](https://www.computerworld.com/article/2497319/business-intelligence-beginner-s-guide-to-r-syntax-quirks-you-ll-want-to-know.html)
+- [Base R CheatSheet](https://iqss.github.io/dss-workshops/R/Rintro/base-r-cheat-sheet.pdf)
+- [Vector functions](https://dcl-prog.stanford.edu/data-structure-basics.html): Great resource on functional programming; sections I and II are relevant and other pages *may include topics we haven't yet covered at this point.*

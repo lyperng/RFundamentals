@@ -1,0 +1,311 @@
+---
+title: "Module 6 - Introduction to Data Visualization"
+author: "Lansing Perng"
+date: "Fall 2023"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+This module will demonstrate the fundamentals of data visualization using R. We will learn how to make plots for the statistical analyses we learned the the last module. This module will cover both base plotting and the `ggplot2` package of tidyverse. We will also learn how to customize plot aesthetics, labels, and legends to enhance clarity and readability.
+
+```{r, message=FALSE, warning=FALSE}
+# rm(list = ls()) clear workspace (optional)
+# install.packages("extrafont") # if you want lots more font options for your plot labels
+# install.packages('Cairo') # for embedding special fonts into your final pdf if you so choose
+
+# load libraries
+library(here)
+library(tidyverse)
+#library(extrafont) 
+```
+
+## Base plotting
+
+Let's try some quick plotting with base R using built in data from the `cars` package. We have used plot for cursory data exploration before, now we will see how to use it to make some nicer plots.
+
+### Base plot labels
+```{r}
+head(cars) # simple dataset with 2 columns
+# ?plot # what other arguments in the function?
+
+#pdf(here('figures','base plot exploration.pdf')) #open a pdf file to save all the plots from this session
+
+plot(cars, xlab = "Speed (mph)", ylab = "Stopping Distance (ft)", main = "Relationship between Speed and Stopping Distance") # can add labels
+```
+
+### Base plot aesthetics
+
+We can also adjust plot aesthetics in base plot, see `par`:
+```{r, eval = F}
+?par # scroll down to graphical parameters and let's try a few
+
+# adjust item sizes
+plot(cars, cex = 1.5) # cex is multiplier--points are 1.5x size
+plot(cars, cex.axis = 1.5, cex.lab = 1.5, cex.main = 1.5) # enlarge axis labels, axis titles, plot title
+
+plot(cars, las = 1) # adjust angles of axis labels
+
+#play with fonts
+#font_import() # imports fonts from extrafont pkg
+#loadfonts(device = "win") # load them into your workspace
+#fonts() # see list of available fonts so you know the exact syntax
+plot(cars, family = 'Century Gothic') # try out some different ones!
+```
+Note that special fonts will not show up in the final pdf file using base plotting. See: <https://r-graphics.org/recipe-output-fonts-pdf>
+
+### Base plot points and lines
+
+Now, let's see how we can customize points and lines in baseplot!
+```{r add.layer, echo=-1}
+plot(cars, col = 'royalblue', pch = 19) # point color and type
+
+lmod1<-lm(dist ~ speed, data = cars) # get lm for trendline
+abline(lmod1, col = "magenta", lty = 5) # add trendline-color red linetype 5 (long dashes)
+```
+<br>[Color options](https://r-charts.com/colors/)
+<br>[Parameter options](https://www.statmethods.net/advgraphs/parameters.html)
+
+### Base plot flexibility
+
+Let's look at some layering options to explore the flexibility of base plot.
+```{r}
+# create a blank plot with different x and y axis lengths
+plot(0, 0, xlim=c(0, 25), ylim=c(0, 120), type='n', xlab='Speed', ylab='Distance') # create blank plot
+
+points(cars$speed, cars$dist, col='hotpink') # layer on points (adds flexibility to add multiple datasets)
+lines(cars$speed, cars$dist) # layer on lines -- will look weird for scatter points
+lines(c(5,25), c(20,100)) # can manually specify c(xmin, xmax), c(ymin, ymax)
+
+abline(h = mean(cars$dist), col = "darkorchid") # add horizontal line at value of interest
+abline(v = mean(cars$speed)-sd(cars$speed), col = "coral1") # add vert line
+abline(v = mean(cars$speed)+sd(cars$speed), col = "coral1") # add vert line
+```
+<br>Note that you would never actually create a plot *this messy*; this is just to demo functionality.
+
+### Base plotting with categorical variables and adding legends
+
+Scatter and line plots are good for plotting data with continuous predictor variables. Boxplots and barplots are used for plotting data with categorical predictor variables. We have also used boxplots before to explore data spread, now we will use boxplot to plot potential results of an analysis.
+
+```{r, message=FALSE}
+head(iris)
+
+## boxplot split by species groups
+boxplot(iris$Sepal.Length ~ iris$Species, xlab = "Species", ylab = "Sepal Length", # can plot y~x in boxplot()
+        main = "Sepal Length by Species",
+        col = 'lightblue')
+# boxplot displays median, middle 50% of data, range, and outliers as points outside the range
+
+## Barplot of sepal length by species
+
+# use dplyr to summarize data
+means <- iris %>%
+  group_by(Species) %>%
+  summarise(mean = mean(Sepal.Length), se = sd(Sepal.Length)/sqrt(length(Sepal.Length)))
+# final table displays two columns, mean and standard error of the mean
+
+means_barx<-barplot(means$mean, # names.arg = means$Species, 
+                    xlab = "Species", ylab = "Sepal Length",
+                    main = "Average Sepal Length by Species",
+                 #   ylim= c(0,7),
+                    col = c("lavender", "skyblue", "lightpink"))
+
+# add legend
+legend(x= 2.73, y =2.3, legend = unique(iris$Species), fill = c("skyblue", "lavender", "lightpink"))
+# can also specify legend position with words eg. 'topright'
+# have to specify legend items manually, can introduce errors
+# how do we fix this one?
+
+# add errors by manually adding lines into the plot with calculated error values
+arrows(means_barx, means$mean + means$se, # top of error bar
+       means_barx, means$mean - means$se, # bottom of error bar
+       length = 0.05, angle = 90, code = 3, lwd = 1.5) # width of caps, angle of caps, type of cap, thickness of lines
+# top of highest error bar is cut off, how do we fix it?
+
+#dev.off() # close the graphics device (i.e. the pdf we opened)
+```
+We can do pretty much anything we want in base plotting; however there are a lot of individual factors we need to manually specify to get a production quality plot. In tidyverse, `ggplot2` is specifically designed to make beautiful plots and has even more flexibility than base plot, and is at times more efficient.
+
+## Introduction to the ggplot2 package (tidyverse)
+
+The `ggplot2` package is extremely versatile, produces high quality graphics, and makes it easier to add very specific customizations to your plot.
+
+```{r, message=FALSE, warning=FALSE}
+
+# plot with ggplot using + to add layers
+g1<-ggplot(means, aes(x = Species, y = mean)) + # df, specify data params
+  geom_bar(stat = "identity", position = "dodge") + # what type of plot
+  # stat: plot default function, position: next to each other
+  
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), # where to where to draw error bars
+                width = 0.04,size=0.5, position = position_dodge(width = 0.9))
+                # cap width, line thickness, same positioning as bars
+#g1 #display plot
+  
+  # Set labels and title
+g2<- g1 + labs(x = "Species", y = "Sepal Length", 
+       title = "Average Sepal Length by Species with Error Bars")
+#g2
+  
+g3<-g2 +  theme_bw()
+
+g3 # display final plot
+
+# Save the ggplot object as a png file
+ggsave(here('figures','gg barplot base.png'), g3, width = 6, height = 4, units = 'in', dpi = 300)
+# specify size in inches and resolution
+```
+
+### ggplot title and axes
+
+```{r, message=FALSE}
+# keep adding on layers
+g4<-g3 + 
+  # adjust title, axis text (tick labels) and titles
+  theme(  #text = element_text(family = 'Century Gothic'),
+          plot.title=element_text(hjust=0.5, size = 19, face = 'bold'), 
+          # center it, font size, bold face
+          
+          axis.ticks = element_line(color = "red", linewidth = 0.5, ), # adjust color and thickness
+          axis.ticks.length = unit(0.5, "cm"), # adjust tick length
+          axis.text=element_text(size=15, angle = 45), # font size
+          # axis.text.x = element_text(size = 20), can also separately adjust axes
+          axis.title=element_text(size=17, # font size
+                                  margin = margin(t = 12, r = 0, b = 0, l = 0))) + # default: 0 pt
+                                  #increases distance between x axis label and plot
+
+  # manually set what values you want to display ticks for
+  scale_y_continuous(breaks=seq(1,7,1)) # 1 to 7, breaks every 1 unit
+  
+g4
+
+# Save the ggplot object as a png file
+ggsave(here('figures','gg barplot title axes.png'), g4, width = 6, height = 4, units = 'in', dpi = 300)
+# is your title cut off? try changing the width of your output png!
+```
+
+### Customizing ggplot aesthetics
+
+In this section we will play with plot aesthetic options, including color and fill, line type, point shape, as well as some tips for how to make any plot look clean and presentable.
+```{r}
+# initialize new plot with args color and fill
+g5<- ggplot(means, aes(x = Species, y = mean, color = Species, fill = Species)) + 
+  # color lines, fill area
+  
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se),
+                width = 0.04,size=0.5, position = position_dodge(width = 0.9)) +
+  labs(x = "Species", y = "Sepal Length", 
+       title = "Average Sepal Length by Species with Error Bars")
+g5
+
+g6 <- g5 +  
+  # Set manual colors 
+  scale_fill_manual(values = c("lavender", "aquamarine", "lightpink")) + # color areas
+  scale_color_manual(values = c("mediumpurple1", "aquamarine4", "rosybrown3")) + # color lines
+
+  # adjust theme for a cleaner plot
+  theme_bw() +
+  theme(  panel.grid.major = element_blank(), #delete major grid lines
+          panel.grid.minor = element_blank()) #delete minor grid lines
+g6
+
+# Save the ggplot object as a png file
+ggsave(here('figures','gg barplot aes.png'), g6, 
+       width = 6, height = 4, units = 'in', dpi = 300)
+```
+Legends are automatic in ggplot! We will cover how to manually adjust legends in the next plotting module.
+
+Let's explore point aesthetics in a scatterplot!
+```{r}
+s<- ggplot(iris, aes(x = Petal.Length, y = Sepal.Length, color = Species)) + 
+  geom_point(shape = 21, fill = NA, alpha = 0.8) # adjust point shape, (fill if open point), transparency
+s
+
+ggsave(here('figures','gg scatter.png'), s, 
+       width = 6, height = 4, units = 'in', dpi = 300)
+```
+Let's explore line aesthetics!
+```{r, message=FALSE}
+# first group the data so there is a mean and spread at each predictor level
+means1<-iris %>% 
+  group_by(Petal.Length, Species) %>% 
+  summarize(m = mean(Sepal.Length),
+            se = sd(Sepal.Length)/sqrt(length(Sepal.Length))) 
+ 
+l1<-ggplot(means1, aes(x = Petal.Length, y = m, group = Species, color = Species)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = m - se, ymax = m + se)) +
+  geom_line(linetype = 'dashed') # also number types, same as base plot par
+l1
+
+ggsave(here('figures','gg line.png'), l1, 
+       width = 6, height = 4, units = 'in', dpi = 300)
+
+```
+Lineplots are commonly used to depict time series data.
+
+Let's add trendlines, which would be more meaningful for a dataset like this one.
+```{r}
+# calculate model
+model <- lm(iris$Sepal.Length ~ iris$Species + iris$Petal.Length)
+
+# predict data based on the model because lines are plotted along specified points
+predicted <- predict(model) 
+
+# residuals <- model$residuals # for plotting error
+
+l2 <- ggplot(iris, aes(x = Petal.Length, y = Sepal.Length, color = Species, fill = Species)) +
+  geom_point() + # put raw data points
+  geom_line(aes(x = Petal.Length, y = predicted)) # + # plot trendline
+#  geom_ribbon(aes(ymin = Predicted - 1.96 * sd(residuals), ymax = Predicted + 1.96 * sd(residuals)),
+  #            group = df$Species, alpha = 0.3, color = 'gray45')
+              # plot 95% confidence interval, representative of inferential stats
+l2
+
+ggsave(here('figures','gg ANCOVA.png'), l2, 
+       width = 6, height = 4, units = 'in', dpi = 300)
+```
+This plot is doable in base, but it would require a lot of individual manual specifications that would be time consuming and would open you up to more errors.
+
+
+## R Markdown code chunk options for displaying plots
+
+- `fig.cap`: A _character_ vector containing the caption for the figure generated by the code.
+- `fig.align`: A _character_ vector indicating the alignment of the figure in the document. Possible values are "left", "center", and "right".
+- `fig.width`: A _numeric_ value indicating the width of the figure in inches.
+- `fig.height`: A _numeric_ value indicating the height of the figure in inches.
+- `fig.dim`: A _numeric_ vector of length 2 indicating the dimensions of the figure in inches.
+- `fig.pos`: A _character_ vector indicating the position of the figure in the document. Possible values are "h", "t", "b", "H", "T", and "B".
+
+## Module Assignment
+1. <span style="color: cornflowerblue">(60 pts)</span> Write an R Markdown document to **plot the results** of the statistical analyses you conducted in your Module 5 assignment. Determine the appropriate plots for your *t-test*, *regression*, *two-factor ANOVA*, and *ANCOVA* and plot them using functions we learned in this module. Your plots should have: 1) informative labels, include error where appropriate, be aesthetically pleasing and easy to understand. Make sure you comment your script clearly.
+
+2. <span style="color: cornflowerblue">(30 pts)</span> Plot a time series graph **overlaying two data frames** of your choice from [NOAA's National Weather Service](https://www.weather.gov/wrh/Climate?wfo=hfo). Using the plotting tools you learned today, combined with tidyverse tools, organize the two datasets to display monthly values from 2000 to 2022, with years labeled on the x-axis. The two datasets should be comparable so that they can be overlaid on the same plot: either the same variable for two geographic regions, or two variables with the same units for the same geographic region. Add horizontal lines plotting the mean of annual maximums from 1971 - 2000 of your two variables. Make sure your plot aesthetics are clear and readers can tell what each plot item represents.
+
+3. <span style="color: cornflowerblue">(10 pts)</span> In addition to whether your code accomplishes the tasks, you will also be graded on whether your code is organized, clear, and well commented. 
+
+3. A reflection of the module including:
+    - difficulty 1-10 and why 
+    - was it a useful/informative?
+    - was it too long or too short? 
+    - what you liked, what you didn't
+    - suggestions for future improvement
+<br>
+
+##### Additional Resources
+
+[Data Visualization with Base R](https://r-graph-gallery.com/base-R.html)
+<br>[Quick Plotting in R](https://r-graphics.org/chapter-quick)
+<br>[Other Base Plotting par() Options](https://www.statmethods.net/advgraphs/parameters.html)
+<br>[R colors](https://r-charts.com/colors/)
+<br>[ggplot2 Book](https://ggplot2-book.org/introduction.html): we will also have a second module on more advanced data visualization with ggplot
+<br>[Manual colors and reordering groups](https://bookdown.org/yih_huynh/Guide-to-R-Book/manual-changes.html)
+<br>[Layering your ggplot](https://bookdown.org/yih_huynh/Guide-to-R-Book/the-order-of-the-layers-matter.html)
+<br>[Customize your Rmd Figure Output](https://rmd4sci.njtierney.com/customising-your-figures.html)

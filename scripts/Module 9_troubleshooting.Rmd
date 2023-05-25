@@ -1,0 +1,44 @@
+---
+title: "Module 9 - Troubleshooting and Error Handling"
+author: "Lansing Perng"
+date: "Fall 2023"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+
+## Common errors in R code
+
+Syntax errors: These errors occur when the code is not written correctly according to the rules of the R language. Examples include mismatched parentheses, brackets, or quotes, misspelled function or variable names, and missing commas.
+
+Object not found errors: These errors occur when the R interpreter cannot find the object or variable that you are trying to use in your code. This can happen if the object has not been created or if it has been deleted or overwritten.
+
+Type errors: These errors occur when you try to perform an operation on two objects that are not compatible. For example, you cannot add a string to a number or divide by zero.
+
+Logical errors: These errors occur when your code runs without throwing any syntax or type errors, but the output or result is not what you expect. These errors can be difficult to diagnose and may require careful inspection of the code to identify the problem.
+
+Package installation errors: These errors occur when you are trying to install a package or library in R and there is a problem with the installation. This can happen if the package is not compatible with your version of R or if there are missing dependencies.
+
+Memory errors: These errors occur when you run out of memory while trying to perform a task. This can happen when working with large datasets or when trying to allocate too much memory to an object.
+
+## Understanding error messages in R
+
+
+## Debugging techniques in R
+
+
+## Practice troubleshooting erroneous code
+
+
+
+
+
+
+

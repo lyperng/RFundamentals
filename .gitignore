@@ -1,0 +1,23 @@
+# Temporary files or editor-specific files
+.Renviron
+.Rprofile
+.Rproj
+.Rproj.user/
+.cache/
+.Rproj.user/
+*.swp
+*~
+
+# R environment files
+.RData
+.Rhistory
+.Rproj.user/
+
+# Package dependencies and build artifacts
+.Rcheck/
+*.tar.gz
+*.Rcheck/
+
+# mac specific
+.DS_Store
+

@@ -1,0 +1,227 @@
+---
+title: "Module 7 - Loops, Conditionals, Apply"
+author: "Lansing Perng"
+date: "Fall 2023"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+In this module, you'll learn how to use the fundamental building blocks of programming in R to create efficient and flexible scripts for data analysis.
+
+Loops automate repetitive tasks and allow us to iterate over collections of data. Conditionals enable us to write scripts that take different actions based on properties we specify. Vectorization applies a function to all items in a vector or array and is a powerful technique for working with large data sets because it is more computationally efficient than loops. If you can accomplish a task using either, choose vectorization over loops.
+
+Throughout this module, we will learn the syntax and functionality of R's loop and conditional structures and how to use them effectively in your code. We'll also explore how vectorization can streamline your data analysis workflows, and provide tips for optimizing your code for speed and memory efficiency.
+
+By the end of this module, you'll have a solid understanding of how to use loops, conditionals, and vectorization in R, and will be able to create flexible and efficient scripts to tackle a wide range of data analysis tasks.
+
+## For Loops
+
+Loops are necessary when you need to to perform an operation separately on each element in the data. You should use loops for working with sequential or dependent data, where the current calculation depends on the previous calculation. In this case, a loop is necessary to iterate through each data point and update the previous value with the current value. Another example is when working with non-vectorizable operations, such as generating random numbers or reading and writing to files.
+
+```{r}
+
+## random sampling and storing outputs using loops
+
+# create a df representing the entire population
+set.seed(007)
+x <- rnorm(100, mean=100, sd=25)
+
+# Create a vector of variable names
+samples <- c("sample 1", "sample 2", "sample 3")
+
+# Loop through the vector of variable names
+for (var in samples) { # for each value in samples, which we will specify with 'var' within our loop
+  
+  # sample 50 values from the population
+  values <- sample(x, 50)
+  
+  # Create a data frame with the values
+  df <- data.frame(values)
+  
+  # Set the name of the data frame to the current variable in our samples vector
+  names(df) <- var
+  
+  # Export the data frame as a CSV file
+  write.csv(df, file = here('outputs',paste(var,'.csv', sep ='')), row.names = FALSE)
+}
+```
+
+`paste()` can be very useful in loops for writing files. It is also useful if you need special characters (e.g. in plot labels). It concatenates strings in R by taking multiple character vectors, separated by commas, as input and returning a single concatenated character vector. Variables (the values you are looping through) are called without quotes, and characters you want to add to the file name are written as 'strings'. The `sep` argument can be used to specify a separator between the elements of the output vector. The default is a space `' '` but we don't want a space between 'sample 1' and '.csv' so we set it as `''`.
+
+
+## Vectorization
+
+### The apply family of functions
+
+```{r}
+######### apply family
+# Create a matrix
+m <- matrix(1:9, nrow = 3)
+
+# Use apply to apply the sum function to each row
+apply(m, 1, sum)
+
+# Use apply to apply the mean function to each column
+apply(m, 2, mean)
+
+# Use lapply to apply the sqrt function to a LIST of numbers
+lapply(list(1, 4, 9), sqrt)
+
+# Use sapply to apply the sum function to a list of vectors
+sapply(list(1:3, 4:6, 7:9), sum)
+
+# Use tapply to apply the mean function to a vector, grouped by a factor
+v <- c(1, 2, 3, 4, 5, 6)
+f <- c("A", "A", "B", "B", "C", "C")
+tapply(v, f, mean)
+```
+
+### The `purrr` package
+
+1.`map` functions applies a function to each element of a vector, and returns the results as a new vector. The basic syntax is: map(X, F, ...) where X is the input vector, F is the function to apply to each element of X, and ... represents any additional arguments to pass to the function getting applied.
+2. The `reduce` function aggregates vectors. The basic syntax is the same as map where F is a function that aggregates the input items in some way (e.g. summing).
+3. The `walk` function works the same as map(), but does not return the results. This can be useful for applying a function that performs an action instead of producing data.
+
+```{r}
+library(purrr)
+
+# use map() to apply the sqrt() function to a vector of numbers:
+x <- c(1, 4, 9, 16)
+y <- map(x, sqrt) #apply sqrt() function to input vector x
+print(y)
+
+# use reduce() to sum all values in a vector
+x <- c(1, 2, 3, 4)
+y <- reduce(x, `+`) #can also use sum(x)
+print(y)
+
+# what about multiplying all values?
+y <- reduce(x, `*`)
+print(y)
+
+# using the walk function to apply an action to an output of map
+x <- c(100, 150, 200)
+sd_val <- c(50,75,100) 
+
+#set.seed(31) # for reproducibility when you're working with random data
+
+list1 <- map(x, rnorm, n = 50, sd = sd_val) #apply rnorm function to vector x containing means, specify additional args for how many values to sample and sd vector
+list2 <- map(x, rnorm, mean = 50, sd = sd_val) #apply rnorm, specifying a set mean and sd vector, which means x vector now represents n samples
+
+# check summary stats of sampled data
+map(list1, mean)
+map(list1, sd)
+
+walk(list1, hist, breaks=10) # apply exploratory hist() to see spread of data
+walk(list2, hist, breaks=10) # breaks specifies size of bins (not exact, depends on data spread; but higher values will give more bins )
+
+############ there are other map functions that can be super useful! ##########
+# create two more random lists of same length as list1 for demo purposes:
+list3 <- map(x, rnorm, n = 50, sd = sd_val) 
+list4 <- map(x, rnorm, n = 50, sd = sd_val)
+
+map2(list1, list3, mean, trim=0.1)
+
+
+
+```
+Note that outputs of functions in the purrr package are list objects, which may require conversion before these outputs can be manipulated by functions outside of tidyverse. This can usually be accomplished by:
+
+```{r}
+# converting to a df
+df1<-data.frame(list1) # will need to rename columns
+
+# or unlisting
+vec1<-unlist(list1) # outputs as a 1D vector of 150 instead of 3 cols of 50
+# unlist works better with when you are unlisting one functional column
+```
+
+
+## Vectorization v. Loops
+
+Here, we will demonstrate how to accomplish the same task with either a for loop or through vectorization.
+```{r}
+# create a list of 5 data frames, each with 1000 rows and 5 columns:
+set.seed(123)
+df_list <- lapply(1:5, function(i) {
+  data.frame(
+    x = rnorm(1000),
+    y = rnorm(1000),
+    z = rnorm(1000),
+    w = rnorm(1000),
+    id = 1:1000
+  )
+})
+
+# loop
+result_list <- list()
+for (i in 1:length(df_list)) {
+  # Step 1
+  means <- sapply(df_list[[i]], mean)
+  
+  # Step 2
+  centered <- lapply(df_list[[i]], function(col) col - means)
+  
+  # Step 3
+  sumsquares <- sapply(centered, function(col) sum(col^2))
+  
+  result_list[[i]] <- sumsquares
+}
+
+result <- do.call(cbind, result_list)
+
+```
+
+
+But loops can often be slow to compute, and this may be particularly burdensome for large datasets. We can instead use vectorization to perform these calculations much more efficiently:
+```{r}
+# Step 1
+means <- lapply(df_list, colMeans)
+means_df <- do.call(rbind, means)
+
+# Step 2
+centered_list <- lapply(df_list, function(df) df - means_df)
+centered_df <- do.call(rbind, centered_list)
+
+# Step 3
+sumsquares <- colSums(centered_df^2)
+
+result <- matrix(sumsquares, nrow = 1)
+
+```
+
+
+You can also use a combination of loops and vectorization:
+
+```{r}
+library(purrr)
+
+sum_squares <- function(x) {
+  result <- 0
+  for (i in seq_along(x)) {
+    result <- result + x[i]^2
+  }
+  return(result)
+}
+
+# Create a list of vectors
+vectors <- list(c(1, 2, 3), c(4, 5, 6), c(7, 8, 9))
+
+# Apply the sum_squares function to each vector using map()
+output <- map_dbl(vectors, sum_squares)
+print(output)
+
+```
+
+
+
+##### Additional Resources
+[purrr Cheatsheet](https://github.com/rstudio/cheatsheets/blob/main/purrr.pdf)
+
