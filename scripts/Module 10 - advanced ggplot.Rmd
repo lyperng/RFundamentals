@@ -52,7 +52,7 @@ g7 <- g6 +
               legend.text=element_text(size=17),
               legend.title=element_blank(),
               legend.margin = margin(2,12,8,10)) +
-        guides(fill=guide_legend(byrow = T)) +
+        guides(fill=guide_legend(byrow = T))
 
 ```
 

@@ -31,11 +31,17 @@ getwd() # your working directory which will be the project folder you just creat
 
 Keeping all your project files in the same place optimizes importing data and exporting outputs, making your coding experience more efficient and organized. To navigate between different projects, click on the "Projects" tab in the RStudio pane on the right side of the screen. 
 
-Keep your projects organized by always having _four basic folders_ in your project folder:
+Keep your projects organized by always having _four basic folders_ in your project folder. We will start a new R script and start writing a few lines of code to do so! Feel free to start the script with some document information, as you would a word doc.
 ```{r, eval=FALSE}
+# introduction to R and ggplot
+# author: 
+# date:
+# notes:
+
+## load libraries and install any that are needed
 install.packages("here", repos = "http://cran.us.r-project.org") #usually just needs the package name argument, but needed the second argument to knit the Rmd file
-library(here) ## DONT put libraries in the middle of your code!
-#this is here only for the purposes of showing the importance of generating these four folders
+library(here) 
+# ALWAYS load libraries at the top of your code! This way, you know which libraries you need for each script and can ensure they are all loaded before you try to use any functions from them.
 
 ## create basic folders for every project
 folders<- c("scripts", "data", "outputs", "figures") # create vector with what you want to name the four folders
@@ -58,7 +64,7 @@ When writing R code, there are several other best practices to follow:
 
 2. _Avoid creating variables or objects with the same name_. The most recently run code will overwrite the previous and you will no longer have that information.
 
-3. _Always load all libraries in the top_ section of each script.Users will know exactly what to expect and what packages are required for the script, and it avoids any possibility of trying to call a function in a library that isn't loaded, as long as you always run this chunk first.
+3. _Always load all libraries in the top_ section of each script. Users will know exactly what to expect and what packages are required for the script, and it avoids any possibility of trying to call a function in a library that isn't loaded, as long as you always run this chunk first.
 
 5. _Comment your code_ using `#` to explain what it does and to help others understand your work. This is vital for data transparency, collaboration, as well as for reminding yourself how you approached an analysis if you come back to it later. You've probably noticed in the above code chunks that I've written brief descriptions of the code. Commenting is also super useful for when you're testing different scripts. You can comment out some lines so that they won't run, but leave them in your script for reference.
 

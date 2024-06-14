@@ -85,7 +85,7 @@ str_detect(my_string, "fox")
 str_extract(my_string, "brown|red") #brown OR red
 
 # Split a string
-vec<- unlist(str_split(my_string, " ")) #function creates list, which cannot be easily manipulated
+vec<- unlist(str_split(my_string, " ")) #function creates list, which can be incompatible with certain functions
 #unlisting turns it into a workable vector
 df1<- data.frame(vec)
 

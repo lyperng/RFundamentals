@@ -14,8 +14,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ## R Overview
 
 
-- []
+- (),[],{},'', ""
 - length()
+- NA v. NULL
 
 
 ## Creating data structures

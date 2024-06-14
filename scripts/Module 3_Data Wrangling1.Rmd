@@ -21,6 +21,19 @@ In our intro to data wrangling module, we will cover the following topics:
 - Editing entries in a dataframe (df$col[row],df[row,col])
 - Dealing with imperfect data (NAs, outliers)
 
+```{r, message=FALSE, warning=FALSE}
+?require
+
+PKG <- c('tidyverse','here')
+
+for (p in PKG) {
+  if(!require(p,character.only = TRUE)) {  
+    install.packages(p)
+    require(p,character.only = TRUE)}
+}
+```
+
+
 ## Importing data
 ```{r}
 write.csv(iris,here('data','iris.csv'), row.names = F) # we will go over writing files at the end

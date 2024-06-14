@@ -1,0 +1,305 @@
+---
+title: "Introduction and Basic ggplot"
+author: "Lansing Perng"
+date: "2024-06-14"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+This introductory module will introduce you to R software, the RStudio interface and cover the basics of starting to code in R. R is a powerful open source software that is free and has the flexibility to do anything you could possibly want with data. Open source means that R software is always under continuous development by a global community of scientists. People are always writing new packages to optimize data analysis and workflow all the time and R allows you to have access to them for free with a single keystroke. Its accessibility also means there are endless resources available for finding help with coding and solving statistical problems. The best part, it's 100% **FREE**! RStudio is a separate program which provides a user-friendly interface for running R code. R will run with out RStudio, but RStudio will not run without R.
+
+## Installing R and RStudio
+
+First, [download R & RStudio](https://posit.co/download/rstudio-desktop/) for your operating system and install it. Once you have both programs, you only need to open RStudio to run R. 
+
+## Creating and navigating R Projects
+
+One of the best practices when working with R is to organize your work into projects. Create a new project now by clicking on the down arrow in the upper right of your interface where it says **Project: (None)** and selecting **New Project**. Select **New Directory**&rarr;**New Project**, then name your project (e.g. 'Intro to R'). This will create a folder named 'Intro to R' in the directory you chose and store all the project files inside. 
+
+Using R projects keeps your code organized and optimizes your R workflow. It is also helpful for code sharing and reproducibility. Working in a project sets the `working directory` to your project directory by default. Your wd is the default folder where your scripts will read in data from and output dataframes and plots to.
+
+```{r, eval=F}
+# check working directory directly in console
+getwd() # your working directory which will be the project folder you just created
+```
+
+Keeping all your project files in the same place optimizes importing data and exporting outputs, making your coding experience more efficient and organized. To navigate between different projects, click on the "Projects" tab in the RStudio pane on the right side of the screen. 
+
+Keep your projects organized by always having _four basic folders_ in your project folder. We will start a new R script and start writing a few lines of code to do so! Feel free to start the script with some document information, as you would a word doc.
+```{r, message=FALSE, warning=FALSE, results = 'hide'}
+# introduction to R and ggplot
+# author: 
+# date:
+# notes:
+
+## load libraries and install any that are needed
+install.packages("here", repos = "http://cran.us.r-project.org") #usually just needs the package name argument, but needed the second argument to knit the Rmd file
+library(here) # to simplify file paths
+library(tidyverse) # used in this script for plotting
+# ALWAYS load libraries at the top of your code! This way, you know which libraries you need for each script and can ensure they are all loaded before you try to use any functions from them.
+
+## create basic folders for every project
+folders<- c("scripts", "data", "outputs", "figures") # create vector with what you want to name the four folders
+
+dir<-here() #assign directory to here, which is the highest level directory (folder) in this project 
+
+create.folders <- function(folder) { # simple function for inserting all folders
+  dir.create(file.path(dir,folder))
+} # we won't explicitly cover functions today, but this is much quicker than running dir.create for each folder individually
+sapply(folders,create.folders) # applies the function we just wrote to each item in the vector 'folders'
+```
+
+You can also just open the project folder and create the folders one by one. But once you have this code, it will be quicker just to copy and paste it whenever you create a new project and run it.
+
+## Best practices in R
+
+When writing R code, there are several other best practices to follow:
+
+1. _Keep your environment clear_ using `rm(list = ls())`. HOWEVER, be warned that if you really start to do a lot of work in R, this is actually not a great line of code to include in your scripts if you share code. When someone else sources your entire script with this line, they will lose all the objects in their environment and they may not want that.
+
+2. _Avoid creating variables or objects with the same name_. The most recently run code will overwrite the previous and you will no longer have that information.
+
+3. _Always load all libraries in the top_ section of each script. Users will know exactly what to expect and what packages are required for the script, and it avoids any possibility of trying to call a function in a library that isn't loaded, as long as you always run this chunk first.
+
+5. _Comment your code_ using `#` to explain what it does and to help others understand your work. This is vital for data transparency, collaboration, as well as for reminding yourself how you approached an analysis if you come back to it later. You've probably noticed in the above code chunks that I've written brief descriptions of the code. Commenting is also super useful for when you're testing different scripts. You can comment out some lines so that they won't run, but leave them in your script for reference.
+
+```{r, eval=FALSE}
+
+rm(list = ls()) #clears your global environment (top right quadrant)
+# can have this line at the top of scripts to clean environment before starting a new workflow, but should remove if you plan on sharing the code
+
+# these hashtags allow you to describe what different lines and sections of code are doing
+# if i am not working in Rmd, I also like to use these to create code sections like so:
+
+##############################################################################
+###################### Section X: Commenting Your Code #######################
+##############################################################################
+# i used the above for section headers
+val <- 2 + 2 # sample code to fill in the section
+#val <- 3 + 3 # commented out because it is named the same as the above object, so will overwrite it if both are run, but i can remove the # to run it whenever
+
+##############################################
+# and i use shorter # lines for splitting subsections
+```
+
+When you type more than four # in a row, it becomes an **expandable and collapsible** section break. Click the downward arrow next to the bottom line (3rd) of the section header! When you start to write long scripts, these section breaks and the collapse functionality will be very useful. 
+
+## R Syntax caveats and general tips
+
+- R is **case-sensitive**!! One tiny typo can cause an error because R will not understand what you are trying to do. You have to be meticulous when you write your code, not only making sure you use the right case, but also making sure every punctuation is where it needs to be.
+- **<-** means **'assign to'** and is likely the most commonly used operator when writing an R script. You can use it to assign R objects like variables, vectors, data structures (dataframes), set values, and more.
+- When you assign an object, it will not display unless you **call the object** by typing out what you named it (see 'val' in above code chunk)
+- `'Single quotes'` are the same as `"double quotes"` as long as you open and close with the same
+- `::` is used to call a function from a specific package without loading the entire package
+- **Select** an entire line easily by clicking in the left margin, where the line numbers are.
+- Operators that **wrap** words/phrases can be easily applied by selecting the word/phrase and clicking the operator once.
+```{r}
+val <- 2 + 2
+Val <- 3 + 3 # assign new object
+
+val
+Val
+# shows 2 different objects because the case is different
+
+string <- NULL # replace 'NULL' with a word and double click and type either a single or double quote
+```
+
+- Use the **TAB** button liberally to complete your code, such as functions, paths,object names. Pressing TAB when you've opened a function (before you type anything within the parentheses) will also show all the available arguments and you can hover your cursor over them to 
+- Use **FIND** (the magnifying glass above your script) to easily search within your script and replace a certain word/phrase. You can also double click the word/object you want to search and type Cmd+F (Ctrl+F for Windows).
+- Some functions, such as `rm(list = ls())` and `getwd()`, are purposefully left blank. This just means there are *no required arguments*. In R, an `argument` is a value or expression the user specifies for a given function within () that tell the function what you want it to do. Some functions may require only one (or even no) arguments, whereas more complex functions will require more and can also accept many added optional arguments. 
+- **Numerical** values can be written straight as numbers: `2000`, but **characters** (words and phrases) have to be written as `strings`, which are enclosed in 'quotes'
+
+```{r}
+val1 <- 2000 # will save as numerical
+year <- '2000'# will save as character
+
+# check with str()
+str(val1) # str() inspects the structure of an object
+str(year) # it provides objects types, dimensions, and contents
+```
+
+## R libraries
+R `libraries` are collections of R functions, data, and documentation that extend the capabilities of R, also called `packages.` You can install libraries from the CRAN repository using the `install.packages()` function. You can also install libraries from source code under development using the devtools library. [Here](https://support.posit.co/hc/en-us/articles/201057987-Quick-list-of-useful-R-packages) is a list of useful packages.
+
+## Introduction to ggplot
+
+The `ggplot2` package of tidyverse is a favorite for plotting figures after statistical analyses. It is extremely versatile, produces high quality graphics, and makes it easier to add very specific customizations to your plot. We will learn how to customize plot aesthetics, labels, and legends to enhance clarity and readability. 
+```{r, eval = FALSE}
+# we will use a data frame included in R for demo
+iris
+```
+
+```{r, message=FALSE, warning=FALSE}
+# we will use a data frame included in R for demo
+str(iris)
+
+# to plot barplots of mean and variation, we will use dplyr to summarize data
+means <- iris %>% # specify df
+  group_by(Species) %>% # what variable are we grouping the bars by
+  summarise(mean = mean(Sepal.Length), se = sd(Sepal.Length)/sqrt(length(Sepal.Length)))
+  # structure of args here is new_colname = function()
+  # e.g., mean before '=' is what we want the column to be named in the new summarized df,
+  # mean(Sepal.Length) after the '=' is the function we are using to calculate the values
+means
+# final table displays two columns, mean and standard error of the mean
+
+?ggplot # can read the function documentation
+
+# plot with ggplot using + to add layers
+g1<-ggplot(means, aes(x = Species, y = mean)) + # df, aesthetics aka data mapping (x and y coordinates)
+  geom_bar(stat = "identity", position = "dodge") + # what type of plot
+  # stat: identity = plot default function, position: dodge = next to each other
+  
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), # where to where to draw error bars
+                width = 0.04,size=0.5, position = position_dodge(width = 0.9))
+                # cap width, line thickness, same positioning as bars
+# each geom is a new layer of the plot and usually requires new mapping (x, y)
+#g1 #display plot
+  
+  # Set labels and title
+g2<- g1 + labs(x = "Species", y = "Sepal Length", 
+       title = "Average Sepal Length by Species with Error Bars")
+#g2
+  
+g3<-g2 +  theme_bw()
+
+g3 # display final plot
+
+# Save the ggplot object as a png file
+ggsave(here('figures/gg barplot base.png'), g3, width = 6, height = 4, units = 'in', dpi = 300)
+# specify size in inches and resolution
+```
+
+### ggplot title and axes
+
+```{r, message=FALSE}
+# keep adding on layers
+g4<-g3 + 
+  # adjust title, axis text (tick labels) and titles
+  theme(  #text = element_text(family = 'Helvetica'),
+          plot.title=element_text(hjust=0.5, size = 19, face = 'bold'), 
+          # center it, font size, bold face
+          
+          axis.ticks = element_line(color = "red", linewidth = 0.5, ), # adjust color and thickness
+          axis.ticks.length = unit(0.5, "cm"), # adjust tick length
+          axis.text=element_text(size=15, angle = 45), # font size and angle
+          # axis.text.x = element_text(size = 20), can also separately adjust axes
+          axis.title=element_text(size=17, # font size
+                                  margin = margin(t = 12, r = 0, b = 0, l = 0))) + # default: 0 pt
+                                  #increases distance between x axis label and plot
+
+  # manually set what values you want to display ticks for
+  scale_y_continuous(breaks=seq(1,7,1)) # 1 to 7, breaks every 1 unit
+  
+g4
+
+# Save the ggplot object as a png file
+ggsave(here('figures/gg barplot title axes.png'), g4, width = 6, height = 4, units = 'in', dpi = 300)
+# is your title cut off? try changing the width of your output png!
+```
+
+### Customizing ggplot aesthetics
+
+In this section we will play with plot aesthetic options, including color and fill, line type, point shape, as well as some tips for how to make any plot look clean and presentable.
+```{r}
+# initialize new plot with args color and fill
+# color is for lines and points, fill is for shapes (bar, boxplots)
+# a few point types are filled points, which accept both color and fill args
+
+# start new ggplot colored by 'Species' grouping
+g5<- ggplot(means, aes(x = Species, y = mean, color = Species, fill = Species)) + 
+  # color lines, fill area
+  
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se),
+                width = 0.04,size=0.5, position = position_dodge(width = 0.9)) +
+  labs(x = "Species", y = "Sepal Length", 
+       title = "Average Sepal Length by Species with Error Bars")
+# g5
+
+g6 <- g5 +  
+  # Set manual colors 
+  scale_fill_manual(values = c("lavender", "aquamarine", "lightpink")) + # color areas
+  scale_color_manual(values = c("mediumpurple1", "aquamarine4", "rosybrown3")) + # color lines
+
+  # adjust theme for a cleaner plot
+  theme_bw() +
+  theme(  panel.grid.major = element_blank(), #delete major grid lines
+          panel.grid.minor = element_blank()) #delete minor grid lines
+g6
+
+# Save the ggplot object as a png file
+ggsave(here('figures/gg barplot aes.png'), g6, 
+       width = 6, height = 4, units = 'in', dpi = 300)
+```
+Legends are automatic by default in ggplot, but can be customized manually as well. 
+
+Let's explore point aesthetics in a scatterplot!
+```{r}
+s<- ggplot(iris, aes(x = Petal.Length, y = Sepal.Length, color = Species)) + 
+  geom_point(shape = 21, fill = NA, alpha = 0.8) # adjust point shape, (fill if open point), transparency
+s
+
+ggsave(here('figures/gg scatter.png'), s, 
+       width = 6, height = 4, units = 'in', dpi = 300)
+```
+Let's explore line aesthetics!
+```{r, message=FALSE}
+# first group the data so there is a mean and spread at each predictor level
+means1<-iris %>% 
+  group_by(Petal.Length, Species) %>% 
+  summarize(m = mean(Sepal.Length),
+            se = sd(Sepal.Length)/sqrt(length(Sepal.Length))) 
+ 
+l1<-ggplot(means1, aes(x = Petal.Length, y = m, group = Species, color = Species)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = m - se, ymax = m + se)) +
+  geom_line(linetype = 'dashed') # also number types, same as base plot par
+l1
+
+ggsave(here('figures/gg line.png'), l1, 
+       width = 6, height = 4, units = 'in', dpi = 300)
+
+```
+Lineplots are commonly used to depict time series data where time is on the x axis and the variable of interest is on the y. Plotting this particular data frame this way does not make sense conceptually, but we are just using this df as to demonstrate ggplot functionality.
+
+Let's add trendlines, which would be more meaningful for a dataset like this one.
+```{r}
+# calculate linear model (regression)
+model <- lm(iris$Sepal.Length ~ iris$Species + iris$Petal.Length)
+#lm (y ~ x); response ~ explanatory var
+
+# predict data based on the model, aka get trendline point values
+predicted <- predict(model) 
+
+# residuals <- model$residuals # for plotting error
+
+l2 <- ggplot(iris, aes(x = Petal.Length, y = Sepal.Length, color = Species, fill = Species)) +
+  geom_point() + # put raw data points
+  geom_line(aes(x = Petal.Length, y = predicted)) # +  # plot trendline
+#  geom_ribbon(aes(ymin = predicted - 1.96 * sd(residuals), ymax = predicted + 1.96 * sd(residuals)),
+#              group = iris$Species, alpha = 0.3, color = 'gray45')
+              # plot 95% confidence interval, representative of inferential stats
+l2
+
+ggsave(here('figures/gg ANCOVA.png'), l2, 
+       width = 6, height = 4, units = 'in', dpi = 300)
+```
+This plot is doable in base, but it would require a lot of individual manual specifications that would be time consuming and would open you up to more errors.
+
+## Getting help in R
+Last but absolutely not least, there is a large and active community of R users. You can find help on R-related topics in online forums, blogs, personal githubs, etc. Additionally, there are many resources available online, including tutorials, documentation, and video courses. When in doubt, don't be afraid to ask for help! Google can be your best friend!
+
+##### Additional Resources
+- [Best Practices](https://towardsdatascience.com/best-practices-for-r-programming-ec0754010b5a)
+- [R colors](https://r-charts.com/colors/)
+- [More ggplot info](https://r-graph-gallery.com/ggplot2-package.html)
+- [Manual colors and reordering groups](https://bookdown.org/yih_huynh/Guide-to-R-Book/manual-changes.html)
+- [Layering your ggplot](https://bookdown.org/yih_huynh/Guide-to-R-Book/the-order-of-the-layers-matter.html)

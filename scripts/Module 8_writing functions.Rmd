@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Overview
 
-In our function writing module, we will learn how to write custom functions for unique research purposes. Writing functions serves to optimize workflow, organize scripts, save time, and reduce errors!. When you need to apply the same function or set of functions repeatedly, instead of writing it over and over again, you can write it into a function for which you only need to fill in a few changing variables.
+In our function writing module, we will learn how to write custom functions for unique research purposes. Writing functions serves to optimize workflow, organize scripts, save time, and reduce errors! When you need to apply the same function or set of functions repeatedly, instead of writing it over and over again, you can write it into a function for which you only need to fill in a few changing variables.
 
 For example, in our first module, I provided code for creating new folders in your working directory that included a function:
 
@@ -46,7 +46,8 @@ Let's start with a simple function to calculate BMI
 
 
 ```{r}
-calculate_bmi <- function(weight_kg, height_m, output=T) { #name function and specify arguments
+# function for calculating bmi from metric weight and height inputs
+calculate_bmi <- function(weight_kg, height_m, output=TRUE) { #name function and specify arguments
   bmi <- weight_kg / (height_m^2) 
   if(output) return(bmi) # by default, the code is executed within the function, but does not produce output outside of the function unless you specifically tell it to
 }
@@ -55,10 +56,10 @@ calculate_bmi(60, 1.5) # it works! but kind of annoying to have to convert to me
 # is there a way to allow the function to accept either lbs & ft or kg an m?
 ```
 
-This function takes 3 arguments: weight in kg, height in m, and an *optional* argument specifying whether you want the output returned when you run the function. You can specify an optional argument by filling in a default value. Here, we set the default as TRUE, so the function will return an output unless you set output=F. When you set have an argument that is a logical, you usually have to write a conditional to execute that part of the function: 'if the logical is T, execute code A, if F, execute code B.' In this case, if the logical is F, the code does nothing a.k.a. it will not execute the return() function.
+This function takes 3 arguments: weight in kg, height in m, and an *optional* argument specifying whether you want the output returned when you run the function. You can specify an optional argument by filling in a default value. Here, we set the default as TRUE, so the function will return an output unless you set output=F. When you set have an argument that is a logical, you usually have to write a conditional to execute that part of the function: 'if the logical is TRUE, execute code A, if FALSE, execute code B.' In this case, if the logical is FALSE, the code does nothing a.k.a. it will not execute the return() function.
 
 
-<span style="color: indianred">Now let's practice writing a simple one. How about a converter? Between kg and lb, mL and oz, F&deg; and C&deg;, USD to Euro, anything you can think of. Google the conversion and start coding!</span>
+<span style="color: indianred">Now let's practice writing a simple one. How about a converter? Between kg and lb, mL and oz, F&deg; and C&deg;, USD to Euro, anything you can think of. Google the conversion equation and start coding!</span>
 
 
 ## Best practices for writing functions in R
